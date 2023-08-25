@@ -1,62 +1,12 @@
+import { Router } from "./router.js";
 
-const routes = {
-  "/":"/pages/home.html",
-  "/universe":"/pages/universe.html",
-  "/exploration":"/pages/exploration.html"
-}
+const router = new Router();
 
-console.log(routes["/"]);
+router.add("/", "/pages/home.html");
+router.add("/universe", "/pages/universe.html");
+router.add("/exploration", "/pages/exploration.html");
 
-function route(event) {
-  event = event || window.event;
-  event.preventDefault();
+router.handle();
 
-  window.history.pushState({}, "", event.target.href)
-  changeBg();
-
-  handle();
-}
-
-function handle() {
-  const {pathname} = window.location
-  const route = routes[pathname]
-
-  fetch(route)
-  .then(data => data.text())
-  .then(html => {
-    document.querySelector('#app').innerHTML = html;
-  })
-  let activePage = pathname.substring(1);
-  if (activePage == '') {
-    activePage = 'home';
-  }
-  clearBold();
-  document.querySelector(`#${activePage}`).classList.add('bold'); 
-}
-
-function clearBold() {
-  document.querySelector(`#home`).classList.remove('bold');
-  document.querySelector(`#universe`).classList.remove('bold');
-  document.querySelector(`#exploration`).classList.remove('bold');
-}
-
-function changeBg() {
-  const { pathname } = window.location;
-  const { body } = document;
-
-  switch (pathname) {
-    case '/exploration':
-      body.className = 'exploration';
-      break;
-
-    case '/universe':
-      body.className = 'universe';
-      break;
-
-    default:
-      body.className = '';
-      break;
-  }
-}
-
-handle();
+window.onpopstate = () => router.handle();
+window.route = () => router.route();
